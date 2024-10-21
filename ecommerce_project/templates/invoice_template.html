@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ order.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            line-height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <h1>Invoice</h1>
+        <p>Order ID: {{ order.id }}</p>
+        <p>Date: {{ date }}</p>
+        <p>Total Price: {{ total_price }}</p>
+        <!-- Add any other order details here -->
+    </div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Filter</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    {% load static %}
+    
+    <!-- Featured Products Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="section-title">
+                        <h4>Featured Product</h4>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8">
+                    <ul class="filter__controls" id="featured-filter">
+                        <li class="active" data-filter="*">All</li>
+                        <li data-filter=".women">Women’s</li>
+                        <li data-filter=".kids">Kid’s</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row property__gallery" id="featured-products">
+                {% for product in featured_product %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix product-item {{ product.category }}">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg">
+                            <a href="{{ product.image_url.url }}"><img src="{{ product.image_url.url }}" ></a>
+                            <ul class="product__hover">
+                                <li><a href="{{ product.img_url.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">{{ product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">{{ product.price }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Featured Products End -->
+
+    <!-- Latest Products Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="section-title">
+                        <h4>Latest Product</h4>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8">
+                    <ul class="filter__controls" id="latest-filter">
+                        <li class="active" data-filter="*">All</li>
+                        <li data-filter=".women">Women’s</li>
+                        <li data-filter=".kids">Kid’s</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row property__gallery" id="latest-products">
+                {% for product in latest_product %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix product-item {{ product.category }}">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg">
+                            <a href="{{ product.image_url.url }}"><img src="{{ product.image_url.url }}"></a>
+                            <div class="label new">New</div>
+                            <ul class="product__hover">
+                                <li><a href="{% static 'img/product/product-1.jpg' %}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                <li><a href="#"><span class="icon_bag_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">{{ product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">{{ product.price }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Latest Products End -->
+
+    <script>
+        $(document).ready(function() {
+            // Initially show all products
+            $('.product-item').show();
+
+            $('#featured-filter li').click(function() {
+                var filterValue = $(this).attr('data-filter');
+                if (filterValue === '*') {
+                    $('#featured-products .product-item').show();
+                } else {
+                    $('#featured-products .product-item').hide();
+                    $('#featured-products ' + filterValue).show();
+                }
+
+                $('#featured-filter li').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            $('#latest-filter li').click(function() {
+                var filterValue = $(this).attr('data-filter');
+                if (filterValue === '*') {
+                    $('#latest-products .product-item').show();
+                } else {
+                    $('#latest-products .product-item').hide();
+                    $('#latest-products ' + filterValue).show();
+                }
+
+                $('#latest-filter li').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!-- ecommerce/templates/ecommerce/login_signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login or Signup</title>
+    <style>
+        /* Add your CSS styling here to match the design */
+    </style>
+</head>
+<body>
+    <div class="login-signup-container">
+        <h2>LOGIN OR SIGNUP</h2>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Enter Email/Mobile number" required>
+            <input type="password" name="password" placeholder="Enter Password" required>
+            <button type="submit">CONTINUE</button>
+        </form>
+        <p>Advantages of our secure login:</p>
+        <ul>
+            <li>Easily Track Orders, Hassle free Returns</li>
+            <li>Get Relevant Alerts and Recommendations</li>
+            <li>Wishlist, Reviews, Ratings and more.</li>
+        </ul>
+        <a href="{% url 'signup' %}">New User? Sign up</a>
+    </div>
+</body>
+</html>

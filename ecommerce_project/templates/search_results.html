@@ -1,0 +1,312 @@
+{% load static %}
+{% load chunks_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block base %}
+    {% include "base.html" %}
+    {% endblock base %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header Section Begin -->
+    {% block header %}
+    {% include "header.html" %}
+    {% endblock header %}
+    <!-- Header Section End -->
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'home' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>Shop</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3">
+                    <div class="shop__sidebar">
+                        <form id="filter-form">
+                            <div class="sidebar__categories">
+                                <div class="section-title">
+                                    <h4>Categories</h4>
+                                </div>
+                                <div class="categories__accordion">
+                                    <div class="accordion" id="accordionExample">
+                                        <div class="card">
+                                            <div class="card-heading">
+                                                <a data-category="women" href="#">Women</a>
+                                            </div>
+                                            <div id="collapseOne" class="collapse" data-parent="#accordionExample">
+                                                <div class="card-body">
+                                                    <ul>
+                                                        <li><a href="#">Coats</a></li>
+                                                        <li><a href="#">Jackets</a></li>
+                                                        <li><a href="#">Dresses</a></li>
+                                                        <li><a href="#">Shirts</a></li>
+                                                        <li><a href="#">T-shirts</a></li>
+                                                        <li><a href="#">Jeans</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-heading">
+                                                <a data-category="kids" href="#">Kids</a>
+                                            </div>
+                                            <div id="collapseThree" class="collapse" data-parent="#accordionExample">
+                                                <div class="card-body">
+                                                    <ul>
+                                                        <li><a href="#">Coats</a></li>
+                                                        <li><a href="#">Jackets</a></li>
+                                                        <li><a href="#">Dresses</a></li>
+                                                        <li><a href="#">Shirts</a></li>
+                                                        <li><a href="#">T-shirts</a></li>
+                                                        <li><a href="#">Jeans</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sidebar__filter">
+                                <div class="section-title">
+                                    <h4>Shop by price</h4>
+                                </div>
+                                <div class="filter-range-wrap">
+                                    <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                        data-min="10" data-max="1000"></div>
+                                    <div class="range-slider">
+                                        <div class="price-input">
+                                            <p>Price:</p>
+                                            <input type="text" id="minamount" name="min_price">
+                                            <input type="text" id="maxamount" name="max_price">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" id="filter-btn">Filter</button>
+                            </div>
+                            <div class="sidebar__sizes">
+                                <div class="section-title">
+                                    <h4>Shop by size</h4>
+                                </div>
+                                <div class="size__list">
+                                    <label for="xxs">
+                                        xxs
+                                        <input type="checkbox" id="xxs" name="size" value="XXS">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label for="xs">
+                                        xs
+                                        <input type="checkbox" id="xs" name="size" value="XS">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <!-- Add more sizes as needed -->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-9">
+                    <div class="row" id="product-list">
+                        {% for product_chunks in results|chunk:1 %}
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            {% for product in product_chunks %}
+                            <div class="product__item">
+                               <div class="product__item__pic set-bg">
+                                <a href="{% url 'product_detail' product.id%}"><img src="{{product.image_url.url}}"></a>
+                                <ul class="product__hover">
+                                    <li><a href="{{ product.image_url.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                    <li><a href="#" class="add-to-wishlist" data-product-id="{{ product.id }}"><span class="icon_heart_alt"></span></a></li>
+                                    <li><a href="#" class="add-to-cart" data-product-id="{{ product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                </ul>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6><a href="#">{{product.name}}</a></h6>
+                                    <div class="rating">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                                    <div class="product__price">{{product.price}}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-lg-12 text-center">
+                        <div class="pagination__option">
+                            {% if products.has_previous %}
+                                <a href="?page={{products.previous_page_number}}"><span>previous</span></a>
+                            {% endif %}
+                            {% for i in products.paginator.page_range %}
+                                <a href="?page={{i}}"><span>{{i}}</span></a>
+                            {% endfor %}
+                            {% if products.has_next %}
+                                <a href="?page={{products.next_page_number}}"><span>next</span></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Section End -->
+
+    <!-- Footer Section Begin -->
+    {% block footer %}
+    {% include "footer.html" %}
+    {% endblock footer %}
+    <!-- Footer Section End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+    <!-- Js Plugins -->
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/mixitup.min.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.add-to-cart').on('click', function(e) {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",  // Position of the toast
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",  // Duration the toast is visible
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var quantity = $(this).closest('.product-item').find('.quantity').val() || 1;
+        
+                console.log("Add to Cart clicked");
+                console.log("Product ID:", productId);
+                console.log("Quantity:", quantity);
+        
+                $.ajax({
+                    url: "{% url 'add_to_cart' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'quantity': quantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.cart_count !== undefined) {
+                            $('#cart-count').text(response.cart_count);
+                        }
+                        toastr.success(response.message);
+                    },
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        
+            $('.add-to-wishlist').on('click', function(e) {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",  // Position of the toast
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",  // Duration the toast is visible
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+        
+                console.log("Add to Wishlist clicked");
+                console.log("Product ID:", productId);
+        
+                $.ajax({
+                    url: "{% url 'add_to_wishlist' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.wishlist_count !== undefined) {
+                            $('#wishlist-count').text(response.wishlist_count);
+                        }
+                        toastr.success(response.message);
+                    },
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        });
+        
+    </script>
+</body>
+</html>

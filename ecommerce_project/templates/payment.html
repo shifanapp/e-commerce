@@ -1,0 +1,75 @@
+<!-- templates/payment.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <script>
+        var options = {
+            "key": "{{ razorpay_key }}", // Enter the Key ID generated from the Dashboard
+            "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 means 50000 paise or ₹500.
+            "currency": "INR",
+            "name": "Your Company Name",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": "{{ order_id }}", // Pass the order ID generated in the backend
+            "handler": function (response){
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{% url 'payment_success' %}";
+
+                var csrfField = document.createElement('input');
+                csrfField.type = 'hidden';
+                csrfField.name = 'csrfmiddlewaretoken';
+                csrfField.value = '{{ csrf_token }}';
+                form.appendChild(csrfField);
+
+                var paymentIdField = document.createElement('input');
+                paymentIdField.type = 'hidden';
+                paymentIdField.name = 'razorpay_payment_id';
+                paymentIdField.value = response.razorpay_payment_id;
+                form.appendChild(paymentIdField);
+
+                var orderIdField = document.createElement('input');
+                orderIdField.type = 'hidden';
+                orderIdField.name = 'razorpay_order_id';
+                orderIdField.value = response.razorpay_order_id;
+                form.appendChild(orderIdField);
+
+                var signatureField = document.createElement('input');
+                signatureField.type = 'hidden';
+                signatureField.name = 'razorpay_signature';
+                signatureField.value = response.razorpay_signature;
+                form.appendChild(signatureField);
+
+                document.body.appendChild(form);
+                form.submit();
+            },
+            "prefill": {
+                "name": "{{ request.user.first_name }}",
+                "email": "{{ request.user.email }}",
+                "contact": "9999999999"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#F37254"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+            alert(response.error.code);
+            alert(response.error.description);
+            alert(response.error.source);
+            alert(response.error.step);
+            alert(response.error.reason);
+            alert(response.error.metadata.order_id);
+            alert(response.error.metadata.payment_id);
+        });
+        rzp1.open();
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    {% block header %}
+     {% include "customadmin/header.html" %}
+    {% endblock header %}
+ 
+
+    <body class="sb-nav-fixed">
+        {% block navbar %}
+        {% include "customadmin/navbar_layout.html" %}
+        {% endblock navbar %}
+
+        <div id="layoutSidenav">
+            {% block sidenavbar %}
+            {% include "customadmin/sidenavbar.html" %}
+            {% endblock sidenavbar %}
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <div id="main-content">
+
+                        <h1 class="mt-4">Dashboard</h1>
+                        <ol class="breadcrumb mb-4">
+                            {% comment %} <li class="breadcrumb-item active">Dashboard</li> {% endcomment %}
+                        </ol>
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-primary text-white mb-4">
+                                    {% comment %} <div class="card-body">Revenue</div> {% endcomment %}
+                                    {% for item in revenue  %}
+                                    <div class="card-body">Revenue : {{item.total_sales}}</div>
+                                    {% endfor %}
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-warning text-white mb-4">
+                                    <div class="card-body">Orders({{total_order_count}})</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="{% url 'orders_list'  %}">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-success text-white mb-4">
+                                    <div class="card-body">Products ({{all_products}})</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="{% url 'product_list'  %}">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-danger text-white mb-4">
+                                    {% for item in monthly_earning  %}
+                                    <div class="card-body">monthly_earning : {{item.total_sales}}</div>
+                                    {% endfor %}                                    
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            
+                              <!-- Time Period Selection -->
+    <div class="mb-4">
+        <a href="?period=daily" class="btn btn-info {% if current_period == 'daily' %}active{% endif %}">Daily</a>
+        <a href="?period=monthly" class="btn btn-info {% if current_period == 'monthly' %}active{% endif %}">Monthly</a>
+        <a href="?period=yearly" class="btn btn-info {% if current_period == 'yearly' %}active{% endif %}">Yearly</a>
+    </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    Sales Report
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    </div>
+                    <h2>Registered User Statistics (Last 7 Days)</h2>
+                    <canvas id="userChart"></canvas>
+                
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        {% block scripts_layout %}
+        {% include "customadmin/scripts_layout.html" %}
+       {% endblock scripts_layout %}
+      <!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ sales_dates|safe }},
+                datasets: [{
+                    label: 'Sales Amount',
+                    data: {{ sales_values|safe }},
+                    backgroundColor: '#4BC0C0',
+                    borderColor: '#36A2EB',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        // Adjust bar width
+                        maxBarThickness: 10,  // Set the maximum width of each bar
+                        barThickness: 10,     // Set the fixed width of each bar
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sales Amount'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+

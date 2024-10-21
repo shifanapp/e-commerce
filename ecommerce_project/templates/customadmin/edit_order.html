@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <style>
+            /* General container styling */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f8f9fa; /* Light grey background */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Form heading */
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Form labels */
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Input fields styling */
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+/* Input fields on focus */
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: #007bff; /* Bootstrap primary color for focus */
+    outline: none;
+}
+
+/* Styling for buttons */
+.btn-primary {
+    background-color: #007bff; /* Bootstrap blue */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Bootstrap grey */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268; /* Darker grey on hover */
+}
+
+/* Footer for the form */
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #e9ecef; /* Light grey */
+    border-radius: 4px;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+</style>
+</head>
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Order #{{ order.id }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Owner (assuming it's a foreign key; you might need a select input here) -->
+        <div class="mb-3">
+            <label for="owner" class="form-label">Owner</label>
+            <input type="text" id="owner" name="owner" class="form-control" value="{{ order.owner.user }}" disabled>
+            <!-- If you want the owner to be editable, add the field appropriately -->
+        </div>
+
+        <!-- Status -->
+        <label for="status" class="form-label">Order Status</label>
+        <select id="status" name="status" class="form-control">
+            <!-- Loop through the choices in STATUS_CHOICES -->
+            {% for value, label in order.STATUS_CHOICES %}
+                <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    
+
+        <!-- Total Price -->
+        <div class="mb-3">
+            <label for="total_price" class="form-label">Total Price</label>
+            <input type="number" id="total_price" name="total_price" class="form-control" value="{{ order.total_price }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'orders_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

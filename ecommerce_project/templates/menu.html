@@ -1,0 +1,169 @@
+{% load static %}
+<head>
+    <style>
+        .header__menu ul li .dropdown li a {
+            font-size: 14px;
+            color: #111111;
+            font-weight: 400;
+            padding: 8px 20px;
+            text-transform: capitalize;
+        }
+        
+        .message {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #4caf50; /* Green background */
+            color: white;
+            padding: 15px;
+            z-index: 1000;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px; /* Adjust padding */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            right: 80px;
+            box-sizing: border-box; /* Prevents padding affecting width */
+        }
+        
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            right: 100px; /* Adjusted for better positioning */
+            transform: translateY(-50%);
+            font-size: 18px; /* Adjusted size for better proportion */
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .search-form {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            max-width: 400px;
+            margin-right: 20px;
+        }
+        
+        
+        
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
+</head>
+
+<body>
+    {% if messages %}
+    <div id="message-container">
+        {% for message in messages %}
+            <div class="message{% if message.tags %} {{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            var messageContainer = document.getElementById('message-container');
+            messageContainer.style.display = 'none';
+        }, 5000);  // Adjust the time (5000ms = 5 seconds) as needed
+    </script>
+    {% endif %}
+    
+<div class="row">
+    <div class="col-xl-3 col-lg-2">
+        <div class="header__logo">
+            <a href="./index.html"><img src="{% static 'img/logo.png' %}" alt=""></a>
+        </div>
+    </div>
+    
+    <div class="col-xl-6 col-lg-7">
+        <nav class="header__menu">
+            <ul>
+                <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'category_view' 'women' %}">Women</a></li>
+                <li><a href="{% url 'category_view' 'kids' %}">Kid’s</a></li>
+                <li><a href="{% url 'list_product' %}">Products</a></li>
+                <li><a href="#">Log in
+                    <img src="{% static 'img/login_logo.svg' %}" alt="logo" /></a>
+                    <ul class="dropdown">
+                        {% if user.is_authenticated %}
+                            <li> 
+                                <a href="{% url 'my_account' %}">My profile
+                               
+                            </a>
+                               
+                               </li>
+                            <li><a href="{% url 'logout' %}">Log out</a></li>
+
+                            
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Log in</a></li>
+                            <li><a href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="header__right">
+            <ul class="header__right__widget">
+                <div class="header__right__auth">
+                    {% comment %} <form method="get" action="{% url 'search' %}" class="search-form" id="searchForm">
+                    <input type="text" name="query" value="{{ form.query.value }}" class="search-input" placeholder="Search...">
+
+                </div>
+                <ul class="header__right__widget">
+                    <li><span class="icon_search" id="searchIcon"></span></li>
+                </form>  {% endcomment %}
+                
+                
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'wishlist' %}">
+                            <span class="icon_heart_alt"></span>
+                            {% if wishlist_count > 0 %}
+                                <div class="tip" id="wishlist-count">{{ wishlist_count }}</div>
+                            {% else %}
+                                <div class="tip" id="wishlist-count" style="display:none;"></div>  <!-- Hidden initially if count is 0 -->
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'cart' %}">
+                            <span class="icon_bag_alt"></span>
+                            {% if cart_count > 0 %}
+                                <div class="tip" id="cart-count">{{ cart_count }}</div>
+                            {% else %}
+                                <div class="tip" id="cart-count" style="display:none;"></div>  <!-- Hidden initially if count is 0 -->
+                            {% endif %}
+                        </a>
+                    </li>
+                    
+                    
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% comment %} <script>
+    document.getElementById('searchIcon').addEventListener('click', function() {
+        document.getElementById('searchForm').submit(); // Submit the form when the icon is clicked
+    });
+</script> {% endcomment %}
+<!-- Ensure jQuery is included -->
+{% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> {% endcomment %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+

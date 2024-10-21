@@ -1,0 +1,25 @@
+{% load static %}
+{% comment %} {% include "header.html" %} {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to View Cart</title>
+    <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'style.css' %}"> {% endcomment %}
+
+</head>
+<body>
+    <div class="container">
+        <div class="message-box">
+            <div class="icon">
+                <img src="{% static 'img/cart_icon.jpg'%}" alt="Cart Icon"> <!-- Replace with your icon image -->
+            </div>
+            <h2>Missing Cart items?</h2>
+            <p>Login to see the items you added previously</p>
+            <button onclick="window.location.href='/customer/login'">Login</button>
+        </div>
+    </div>
+</body>
+</html>

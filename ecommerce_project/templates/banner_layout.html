@@ -1,0 +1,26 @@
+{% load static %}
+<section class="categories">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 p-0">
+                <div class="categories__item categories__large__item set-bg"
+                data-setbg="{% static 'img/categories/g1.jpg' %}">
+                <div class="categories__text">
+                    <h1>Women’s fashion</h1>
+                    <p>I want people to see the dress, but focus on the woman.</p>
+                    <a href="{% url 'category_view' 'women' %}">Shop now</a>
+                </div>
+            </div>
+        </div>
+            <div class="col-lg-6 p-0">
+                <div class="categories__item categories__large__item set-bg"
+                data-setbg="{% static 'img/categories/k1.jpg' %}">                    
+                <div class="categories__text">
+                    <h1>Kid’s fashion</h1>
+                    <p>Dressing up the cutest little fashionista in town!</p>
+                    <a href="{% url 'category_view' 'kids' %}">Shop now</a>
+                </div>
+            </div>
+    </div>
+</div>
+</section>

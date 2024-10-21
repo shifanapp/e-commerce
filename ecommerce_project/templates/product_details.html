@@ -1,0 +1,591 @@
+{% load static %}
+<DOCTYPE html>
+{% block base %}
+{% include "base.html" %}
+{% endblock base %}
+{% include "header.html" %}
+<head>
+    <style>
+        /* Add styles for star rating, customer images, etc. */
+.rating-summary .star-rating {
+    font-size: 1.5em;
+    color: #ffb400;
+}
+
+.feedback-tags .tag {
+    background-color: #f0f0f0;
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+}
+
+.customer-images img {
+    margin: 5px;
+}
+
+.review-item {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 0;
+}
+/* Center the form and add padding */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Style the form labels */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Style the form fields */
+select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Style the submit button */
+button[type="submit"], input[type="submit"] {
+    background-color: #f39c12;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* Add hover effect for the button */
+button[type="submit"]:hover, input[type="submit"]:hover {
+    background-color: #e67e22;
+}
+
+/* Add padding and style the overall review section */
+.review-section {
+    padding: 30px;
+    border: 1px solid #e1e1e1;
+    background-color: #fafafa;
+    border-radius: 10px;
+}
+
+/* Adjust the heading styles */
+.review-section h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.review-section h4 {
+    font-size: 18px;
+    color: #888;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+
+<!-- Include Owl Carousel CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+
+<!-- Include ElevateZoom CSS --><!-- Include ElevateZoom CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/elevatezoom.css">
+</head>
+<body>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Owl Carousel JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<!-- Include ElevateZoom JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+<!-- Include Owl Carousel JS -->
+<script src="path_to_owl_carousel_js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+   
+    <div id="messages"></div>
+
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                        <a href="#">{{product.category}} </a>
+                        <span>{{product.name}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__left product__thumb nice-scroll">
+                            <a href="{{product.image_url.url}}" class="zoom">
+                                <img src="{{product.image_url.url}}"  alt="Product Image">
+                            </a>
+                            <a class="pt" href="#product-2">
+                                
+                                <img src="{{product.image_1.url}}" alt="">
+                            </a>
+                            <a class="pt" href="#product-3">
+                                <img src="{{product.image_2.url}}" alt="">
+                            </a>
+                            <a class="pt" href="#product-4">
+                                <img src="{{product.image_3.url}}"  alt="">
+                            </a>
+                        </div>
+                        <div class="product__details__slider__content">
+                            <div class="product__details__pic__slider owl-carousel">
+                                <img class="big_img" data-hash="product-1" class="product__big__img" src="{{ product.image_url.url }}" data-zoom-image="{{ product.image_url.url }}" alt="">
+                                <img class="big_img" data-hash="product-2" class="product__big__img" src="{{ product.image_1.url }}" data-zoom-image="{{ product.image_1.url }}" alt="">
+                                <img class="big_img" data-hash="product-3" class="product__big__img" src="{{ product.image_2.url }}" data-zoom-image="{{ product.image_2.url }}" alt="">
+                                <img class="big_img" data-hash="product-4" class="product__big__img" src="{{ product.image_3.url }}" data-zoom-image="{{ product.image_3.url }}" alt="">
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text">
+                        <h3>{{product.name}} <span></span></h3>
+                        <div class="rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <span>( 138 reviews )</span>
+                        </div>
+                        <div class="product__details__price">{{product.price}} </div>
+                        {% comment %} <p>{{product.description}}</p> {% endcomment %}
+                        <div class="product__details__button">
+                            <form class="add-to-cart-form" data-product-id="{{ product.id }}" method="post" action="{% url 'add_to_cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{product.id}}" name="product_id"\>
+                            <div class="quantity">
+                                <span>Quantity:</span>
+                                <div class="pro-qty">
+                                    <input type="text" name="quantity" value="1">
+                                </div>
+                            </div>
+                            
+                            <button type="submit"class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</button>
+                            </form> 
+                            <form action="{% url 'buy_now' product.id %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_price" value="{{ product.price }}">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                                <button type="submit" class="cart-btn"name="buy_now">Buy Now</button>
+
+                            </form>
+                            <form class="add-to-wishlist-form" data-product-id="{{ product.id }}" method="post" action="{% url 'add_to_wishlist' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button type="submit"class="cart-btn"><span class="icon_heart_alt"></span>Add to Wishlist</button>
+                            </form>
+                            <ul>
+                                {% comment %} <li><a href="{% url 'add_to_wishlist' product.id %}"><span class="icon_heart_alt"></span></a></li> {% endcomment %}
+                                {% comment %} <li><a href="#"><span class="icon_adjust-horiz"></span></a></li> {% endcomment %}
+                            </ul>
+                        </div>
+                        <div class="product__details__widget">
+                            <ul>
+                                <li>
+                                    <span>Availability:</span>
+                                    <div class="stock__checkbox">
+                                        <label for="stockin">
+                                            In Stock
+                                            {% comment %} <input type="checkbox" id="stockin"> {% endcomment %}
+                                            {% comment %} <span class="checkmark"></span> {% endcomment %}
+                                        </label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Available size:</span>
+                                    <div class="size__btn">
+                                        {% for size in sizes %}
+                                        <label for="xs-btn" class="active">
+                                            <input type="radio" id="xs-btn">
+                                            {{ size.name }}
+                                        </label>
+                                       {% endfor %}
+                                       
+                                        
+                                        
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Promotions:</span>
+                                    <p>Free shipping</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                            </li>
+                            {% comment %} <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
+                            </li> {% endcomment %}
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <h6>Description</h6>
+                                <p>
+                                    {{product.description}}
+                                </p>
+                                
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                <h2>Reviews</h2>
+                                <!-- Star rating display -->
+<div class="rating-summary">
+    <h2>Ratings & Reviews</h2>
+    <div class="average-rating">
+        <span class="star-rating">{{ average_rating|floatformat:1 }}★</span>
+        <span>{{ reviews.count }} Ratings & {{ reviews.count }} Reviews</span>
+    </div>
+</div>
+
+<!-- Feedback Tags -->
+<div class="feedback-tags">
+    <p>What our customers felt:</p>
+    <span class="tag">Fabric Quality</span>
+    <span class="tag">Comfort</span>
+    <span class="tag">Style</span>
+</div>
+
+
+<!-- Displaying Reviews -->
+<div class="reviews-list">
+    {% for review in reviews %}
+        <div class="review-item">
+            <p><strong>{{ review.user.username }}</strong> - {{ review.rating }}★</p>
+            <p>{{ review.comment }}</p>
+            
+        </div>
+    {% empty %}
+        <p>No reviews yet. Be the first to leave one!</p>
+    {% endfor %}
+</div>
+
+<!-- Review Submission Form -->
+{% if user.is_authenticated %}
+    <div class="review-section">
+    <h3>Leave a Review</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to leave a review.</p>
+{% endif %}                             <p></p>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="related__title">
+                        <h5>RELATED PRODUCTS</h5>
+                    </div>
+                </div>
+                {% for related_product in related_products %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" >
+                            <a href="{% url 'product_detail' related_product.id%}"><img src="{{related_product.image_url.url}}"></a>
+                            <div class="label new">New</div>
+                            <ul class="product__hover">
+                                <li><a href="{{ related_product.image_url.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a href="#" class="add-to-wishlist" data-product-id="{{ related_product.id }}"><span class="icon_heart_alt"></span></a></li>
+                                    <li><a href="#" class="add-to-cart" data-product-id="{{ related_product.id }}"><span class="icon_bag_alt"></span></a></li>
+               
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">{{ related_product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">{{related_product.price}}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+
+     <!-- Instagram End -->
+
+    <!-- Footer Section Begin -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-7">
+                    <div class="footer__about">
+                        <div class="footer__logo">
+                            <a href="./index.html"><img src="img/logo.png" alt=""></a>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    <div class="footer__copyright__text">
+                        <p>Copyright &copy; <script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a></p>
+                    </div>
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+       <!-- Js Plugins -->
+       <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+       <script src="{% static 'js/bootstrap.min.js' %}"></script>
+       <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+       <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+       <script src="{% static 'js/mixitup.min.js' %}"></script>
+       <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+       <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+       <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+       <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+       <script src="{% static 'js/main.js' %}"></script>
+
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+       <script>
+   
+        $(document).ready(function() {
+            function handleFormSubmit(form, url, countSelector, countType) {
+                form.on('submit', function(e) {
+                    e.preventDefault();
+                    let productId = form.data('product-id');
+        
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: form.serialize() + '&product_id=' + productId,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        success: function(response) {
+                    if (response[countType] !== undefined) {
+                        $('#' + countSelector).text(response[countType]);
+                    }
+                    toastr.success(response.message);
+                },
+                error: function(response) {
+                    if (response.status === 403) {
+                        toastr.error("You need to log in to perform this action.");
+                    } else if (response.status === 400) {
+                        toastr.error(response.responseJSON.message);
+                    } else {
+                        toastr.error("An error occurred. Please try again.");
+                    }
+                }
+            });
+        });
+    }
+
+    handleFormSubmit($('.add-to-cart-form'), "{% url 'add_to_cart' %}", 'cart-count', 'cart_count');
+    handleFormSubmit($('.add-to-wishlist-form'), "{% url 'add_to_wishlist' %}", 'wishlist-count', 'wishlist_count');
+});
+        
+        
+</script>
+    
+   
+       <script>
+            // Initialize Owl Carousel
+            $(".product__details__pic__slider").owlCarousel({
+                alert("hi")
+                items: 1,
+                loop: true,
+                nav: true,
+                dots: false,
+                navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>']
+            });
+    
+            // Initialize ElevateZoom on each image
+            $('.product__big__img').elevateZoom({
+                zoomType: "lens",
+                lensShape: "round",
+                lensSize: 200
+            });
+     
+    </script>
+    <script src="{% static 'js/zoomsl.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".small_img").hover(function() {
+                $(".big_img").attr('src', $(this).attr('src'));
+            });
+
+            $(".big_img").imagezoomsl({
+                zoomrange: [3, 3]
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.add-to-cart').on('click', function(e) {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",  // Position of the toast
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",  // Duration the toast is visible
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var quantity = $(this).closest('.product-item').find('.quantity').val() || 1;
+        
+                console.log("Add to Cart clicked");
+                console.log("Product ID:", productId);
+                console.log("Quantity:", quantity);
+        
+                $.ajax({
+                    url: "{% url 'add_to_cart' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'quantity': quantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.cart_count !== undefined) {
+                            $('#cart-count').text(response.cart_count);
+                        }
+                        toastr.success(response.message);
+                    },
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        
+            $('.add-to-wishlist').on('click', function(e) {
+                toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",  // Position of the toast
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",  // Duration the toast is visible
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+        
+                console.log("Add to Wishlist clicked");
+                console.log("Product ID:", productId);
+        
+                $.ajax({
+                    url: "{% url 'add_to_wishlist' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.wishlist_count !== undefined) {
+                            $('#wishlist-count').text(response.wishlist_count);
+                        }
+                        toastr.success(response.message);
+                    },
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        });
+        
+    </script>
+
+
+    </body>
+   </html>

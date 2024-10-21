@@ -1,0 +1,15 @@
+<!-- templates/category.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ category }} Products</title>
+</head>
+<body>
+    <h2>{{ category }} Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>{{ product.name }} - {{ product.price }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

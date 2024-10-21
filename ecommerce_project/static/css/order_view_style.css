@@ -1,0 +1,154 @@
+/* General Container Styling */
+.container-fluid {
+    padding: 0 15px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header, .card-footer {
+    padding: 15px;
+}
+
+.card-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.card-footer {
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+/* Header and Body Styling */
+.card-header p, .card-body p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-dark {
+    color: #343a40;
+}
+
+.Today {
+    color: #007bff;
+}
+
+.btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.media-body {
+    flex: 1;
+    padding-right: 15px;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.align-self-center {
+    align-self: center;
+}
+
+.card-body h4 {
+    margin: 0;
+}
+
+/* Progress Bar Styling */
+#progressbar {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+#progressbar li {
+    position: relative;
+    width: 33.33%;
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+}
+
+#progressbar li:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: #ddd;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+#progressbar li.active:before {
+    background: #007bff;
+}
+
+#progressbar li.active {
+    color: #007bff;
+}
+
+#progressbar li.text-muted {
+    color: #6c757d;
+}
+
+#progressbar li.step0 {
+    font-weight: normal;
+}
+
+#progressbar li.step0.active {
+    font-weight: bold;
+}
+
+/* Footer Styling */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.border-line {
+    border-right: 1px solid #ddd;
+    padding: 10px;
+}
+
+.border-line:last-child {
+    border-right: none;
+}
+
+.img-fluid.cursor-pointer {
+    cursor: pointer;
+}
+.fas.fa-eye {
+    font-size: 24px; /* Adjust the size */
+    color: #007bff;  /* Bootstrap primary color */
+    cursor: pointer;
+}
+.fas.fa-eye:hover {
+    color: #0056b3; /* Darker blue on hover */
+}

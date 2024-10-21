@@ -1,0 +1,142 @@
+{% load static %}
+{% include "base.html" %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+{% include "menu.html" %}
+<div class="cart-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-heading mb-10">My Wishlist</div>
+                <div class="table-wishlist">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th width="45%">Product Name</th>
+                                <th width="15%">Unit Price</th>
+                                <th width="15%">Stock Status</th>
+                                <th width="15%"></th>
+                                <th width="10%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist_items %}
+                            <tr>
+                                <td width="45%">
+                                    <div class="display-flex align-center">
+                                        <div class="img-product">
+                                            <img src="{{ item.product.image_url.url }}" alt="" class="mCS_img_loaded">
+                                        </div>
+                                        <div class="name-product">{{ item.product.name }}</div>
+                                    </div>
+                                </td>
+                                <td width="15%" class="price">{{ item.product.price }}</td>
+                                <td width="15%">
+                                    <span class="in-stock-box">In Stock</span>
+                                </td>
+                                <td width="15%">
+                                    <button class="round-black-btn small-btn add-to-cart-btn" data-product-id="{{ item.product.id }}">Add to Cart</button>
+                                </td>
+                                <td width="10%" class="text-center">
+                                    <a href="#" class="trash-icon remove-from-wishlist-btn" data-product-id="{{ item.product.id }}">
+                                        <i class="far fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add to Cart via AJAX
+		// Add to Cart via AJAX and remove the row from wishlist
+			// Add to Cart via AJAX and remove the row from wishlist
+			$('.add-to-cart-btn').click(function(e) {
+				e.preventDefault();
+				var productId = $(this).data('product-id');
+				var row = $(this).closest('tr'); // Get the current row to remove later
+				var quantity = 1;  // Assuming quantity is 1 for now, adjust as needed
+		
+				$.ajax({
+					url: "{% url 'add_to_cart' %}",
+					type: 'POST',
+					data: {
+						'product_id': productId,
+						'quantity': quantity,
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+					},
+					success: function(response) {
+						toastr.success(response.message);
+						
+						// Update cart count (if you have a cart count element)
+						$('#cart-count').text(response.cart_count);
+						
+						// Remove the row from the wishlist table
+						row.remove();
+						
+						// Update the wishlist count
+						updateWishlistCount();
+					},
+					error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+				});
+			});
+		
+			// Remove from Wishlist via AJAX and update the wishlist count
+			$('.remove-from-wishlist-btn').click(function(e) {
+				e.preventDefault();
+				var productId = $(this).data('product-id');
+				var row = $(this).closest('tr'); // Get the current row to remove later
+		
+				$.ajax({
+					url: "{% url 'remove_from_wishlist' %}",
+					type: 'POST',
+					data: {
+						'product_id': productId,
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+					},
+					success: function(response) {
+						toastr.success(response.message);
+						
+						// Remove the row from the wishlist table
+						row.remove();
+		
+						// Update the wishlist count
+						updateWishlistCount();
+						// Check if wishlist is empty and redirect
+						if ($('#wishlist-count').text() == 0) {
+							window.location.href = "{% url 'wishlist_empty' %}";
+						}
+					},
+					error: function(xhr, errmsg, err) {
+						toastr.error('An error occurred while removing the product from your wishlist.');
+					}
+				});
+			});
+		
+			// Function to update the wishlist count
+			function updateWishlistCount() {
+				var currentWishlistCount = parseInt($('#wishlist-count').text());
+				if (currentWishlistCount > 0) {
+					$('#wishlist-count').text(currentWishlistCount - 1);
+				}
+			}
+		</script>
+		

@@ -1,0 +1,627 @@
+{% load static %}
+{% load getstatus %}
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Addresses</title>   
+    <head>
+        {% block base %}
+        {% include "base.html" %}
+        {% endblock base %}
+    
+        {% comment %} {% include "menu.html" %} {% endcomment %}
+        <!-- Top bar End -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+     <script>
+
+        // Toggle form visibility for adding a new address
+        // Toggle form visibility for adding a new address
+function toggleAddAddressForm() {
+    document.getElementById('address-form').style.display = 'block';
+    document.getElementById('action').value = 'add'; // Set form action to 'add'
+    clearFormFields(); // Clear form fields for adding a new address
+}
+
+function activateAddressTab() {
+    var addressTab = new bootstrap.Tab(document.getElementById('address-tab'));
+    addressTab.show(); // Make sure the tab is active
+}
+
+// Populate form fields for editing an existing address
+function editAddress(id, line1, line2, city, state, country, zipCode, phoneNumber, isDefault) {
+    activateAddressTab(); // Ensure the tab is active
+    document.getElementById('address-form').style.display = 'block';
+    document.getElementById('action').value = 'edit'; // Set form action to 'edit'
+    document.getElementById('address_id').value = id;
+    document.getElementById('line1').value = line1;
+    document.getElementById('line2').value = line2;
+    document.getElementById('city').value = city;
+    document.getElementById('state').value = state;
+    document.getElementById('country').value = country;
+    document.getElementById('zip_code').value = zipCode;
+    document.getElementById('phone_number').value = phoneNumber;
+    document.getElementById('is_default').checked = isDefault;
+}
+
+// Function to clear form fields for adding a new address
+function clearFormFields() {
+    document.getElementById('address_id').value = '';
+    document.getElementById('line1').value = '';
+    document.getElementById('line2').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('state').value = '';
+    document.getElementById('country').value = '';
+    document.getElementById('zip_code').value = '';
+    document.getElementById('phone_number').value = '';
+    document.getElementById('is_default').checked = false;
+}
+
+// Delete address using AJAX
+function deleteAddress(id) {
+    // Use SweetAlert2 to show confirmation dialog
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Perform the AJAX request if the user confirms
+            $.ajax({
+                url: '{% url "manage_addresses" %}',
+                method: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'action': 'delete',
+                    'address_id': id
+                },
+                success: function(response) {
+                    toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": true,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",  // Position of the toast
+                        "preventDuplicates": true,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",  // Duration the toast is visible
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    };
+                    toastr.success(response.message); // Show success message using toastr
+
+                    // Remove the address from the DOM
+                    document.getElementById('address-' + id).remove();
+
+                    // Check if there are any remaining addresses
+                    if ($('.address-list').children().length === 0) {
+                        // No remaining addresses, so show the "No addresses" message
+                        $('.address-list').html('<p>No addresses available. Please add one!</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    toastr.error("An error occurred while deleting the address."); // Show error using toastr
+                }
+            });
+        }
+    });
+}
+
+
+// Handle form submission for add/edit
+function submitForm(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const formData = $('#address-form').serialize();
+
+    $.ajax({
+        url: '{% url "manage_addresses" %}', // Django URL for managing addresses
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",  // Position of the toast
+                "preventDuplicates": true,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",  // Duration the toast is visible
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+            toastr.success(response.message); // Show success message using toastr
+            
+            if (response.address) {
+                // Add the new address to the address list in the DOM
+                updateAddressInDOM(response.address);
+            }
+            
+            // Clear the form fields after submission
+            clearFormFields();
+
+            // Hide the form modal or the form itself
+            document.getElementById('address-form').style.display = 'none';
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText); // Log any errors for debugging
+            toastr.error("An error occurred while adding the address.");
+        }
+    });
+}
+
+
+function updateAddressInDOM(address) {
+    const addressHTML = `
+        <div id="address-${address.id}">
+            <p>${address.line1}, ${address.city}, ${address.state}, ${address.country} - ${address.zip_code}<br>
+                Phone: ${address.phone_number}<br>
+                Default: ${address.is_default ? 'Yes' : 'No'}
+            </p>
+            <button onclick="editAddress('${address.id}', '${address.line1}', '${address.line2}', '${address.city}', '${address.state}', '${address.country}', '${address.zip_code}', '${address.phone_number}', ${address.is_default})">Edit</button>
+            <button onclick="deleteAddress('${address.id}')">Delete</button>
+            <hr>
+        </div>`;
+
+    let existingElement = document.getElementById('address-' + address.id);
+    if (existingElement) {
+        existingElement.outerHTML = addressHTML;
+    } else {
+        // Append new address and remove the "No addresses available" message if present
+        $('.address-list').append(addressHTML);
+        $('.no-address-message').remove(); // Remove no-address message if any
+    }
+}
+
+
+
+
+
+    </script>
+    
+ <!--adrress css-->
+    {% comment %} <link rel="stylesheet" href="{% static 'css/style3.css' %}" type="text/css"> {% endcomment %}
+<!--account html-->
+    <link rel="stylesheet" href="{% static 'css/style4.css' %}" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Toastr JS (Include Toastr CSS and JS) -->
+{% comment %} <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"> {% endcomment %}
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> {% endcomment %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/order_view_style.css' %}" type="text/css">
+<style>
+    /* General styles for the address list container */
+.address-list {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Styles for individual address entries */
+.address-list p {
+    font-size: 16px;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    line-height: 1.5;
+}
+
+/* Buttons for editing and deleting addresses */
+.address-list button {
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.address-list button:hover {
+    background-color: #0056b3;
+}
+
+/* Separator line between addresses */
+.address-list hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 20px 0;
+}
+
+/* Style for the 'Add Address' button */
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Styles for the Add/Edit Address form */
+#address-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#address-form label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+#address-form input[type="text"],
+#address-form input[type="checkbox"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Checkbox and its label alignment */
+#address-form input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+#address-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#address-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Style to hide the form initially */
+#address-form {
+    display: none;
+}
+</style>
+</head>
+    <body>
+
+
+        <!-- Top bar Start -->
+ <!-- Header Section Begin -->
+ {% block header %}
+ {% include "header.html" %}
+ {% endblock header %}
+ <!-- Header Section End -->
+
+
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url "home" %}">Home</a></li>
+                    <li class="breadcrumb-item active">My Account</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- My Account Start -->
+        <div class="my-account">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link" id="dashboard-nav" data-bs-toggle="pill" href="#dashboard-tab" role="tab">
+                                <i class="fa fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            <a class="nav-link" id="orders-nav" data-bs-toggle="pill" href="#orders-tab" role="tab">
+                                <i class="fa fa-shopping-bag"></i> Orders
+                            </a>
+                            <a class="nav-link" id="address-nav" data-bs-toggle="pill" href="#address-tab" role="tab">
+                                <i class="fa fa-map-marker-alt"></i> Address
+                            </a>
+                            <a class="nav-link" id="account-nav" data-bs-toggle="pill" href="#account-tab" role="tab">
+                                <i class="fa fa-user"></i> Account Details
+                            </a>
+                            <a class="nav-link" href="{% url 'logout' %}">
+                                <i class="fa fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-9">
+                        <div class="tab-content">
+                            <div class="tab-pane fade" id="dashboard-tab" role="tabpanel" aria-labelledby="dashboard-nav">
+                                <h4>Dashboard</h4>
+                                <p>
+                                    Hello {{user.username}}
+                                </p> 
+                            </div>
+                            <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="shop__cart__table">
+                                                {% if orders %}
+                        
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order ID</th>
+                                                            <th>Date</th>
+                                                            <th>Total Price</th>
+                                                            <th>Order status</th>
+                                                            <th>Action</th>
+                                                            <th></th>
+                                                        </tr>
+                                                        {% for order in orders  %}
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>{{order.id}}</td>
+                                                            <td>{{order.created_at}}</td>
+                                                            <td>{{order.total_price}}</td>
+                                                            <td>{% getstatus order.status %} </td>
+                                                            <td>  
+                                                                <a href="{% url 'order_view' order.id %}" class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                                    View
+                                                                </a>
+                        
+                                                            </a></td>
+                                                                
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                                {% else %}
+                                               <p> empty orders</p>
+                                               {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            {% comment %} <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
+                                <h4>Payment Method</h4>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non. Praesent in faucibus tellus, sed gravida lacus. Vivamus eu diam eros. Aliquam et sapien eget arcu rhoncus scelerisque.
+                                </p> 
+                            </div> {% endcomment %}
+                            <div class="tab-pane fade" id="address-tab" role="tabpanel" aria-labelledby="address-nav">
+                                <h2>Your Addresses</h2>
+<div class="address-list">
+    {% if addresses %}
+        {% for address in addresses %}
+            <div id="address-{{ address.id }}">
+                <p>{{ address.line1 }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.zip_code }}<br>
+                    Phone: {{ address.phone_number }}<br>
+                    Default: {{ address.is_default }}</p>
+                <button onclick="editAddress('{{ address.id }}', '{{ address.line1 }}', '{{ address.line2 }}', '{{ address.city }}', '{{ address.state }}', '{{ address.country }}', '{{ address.zip_code }}', '{{ address.phone_number }}', {{ address.is_default|yesno:'true,false' }})">Edit</button>
+                <button onclick="deleteAddress('{{ address.id }}')">Delete</button>
+                <hr>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-address-message">No addresses available. Please add one!</p>
+    {% endif %}
+</div>
+
+                            
+                                <!-- Button to toggle Add Address Form -->
+                                <button onclick="toggleAddAddressForm()">Add Address</button>
+                            
+                                <!-- Add/Edit Address Form (Initially Hidden) -->
+                                <!-- Add/Edit Address Form (Initially Hidden) -->
+<form id="address-form" method="post" onsubmit="submitForm(event)" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" id="action" name="action" value="add">
+    <input type="hidden" id="address_id" name="address_id">
+    <label for="line1">Line 1:</label>
+    <input type="text" id="line1" name="line1" required><br>
+    <label for="line2">Line 2:</label>
+    <input type="text" id="line2" name="line2"><br>
+    <label for="city">City:</label>
+    <input type="text" id="city" name="city" required><br>
+    <label for="state">State:</label>
+    <input type="text" id="state" name="state" required><br>
+    <label for="country">Country:</label>
+    <input type="text" id="country" name="country" required><br>
+    <label for="zip_code">Zip Code:</label>
+    <input type="text" id="zip_code" name="zip_code" required><br>
+    <label for="phone_number">Phone Number:</label>
+    <input type="text" id="phone_number" name="phone_number" required><br>
+    <label for="is_default">Default:</label>
+    <input type="checkbox" id="is_default" name="is_default"><br>
+    <button type="submit">Submit</button>
+</form>
+
+                            </div>
+                                                       
+                            
+                            <div class="tab-pane fade" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                                <h4>Account Details</h4>
+<form id="update-account-form" method="post" action="{% url 'update_account' %}">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            <input class="form-control" type="text" name="first_name" value="{{ request.user.customer_profile.first_name }}" placeholder="First Name">
+        </div>
+        <div class="col-md-6">
+            <input class="form-control" type="text" name="last_name" value="{{ request.user.customer_profile.last_name }}" placeholder="Last Name">
+        </div>
+        <div class="col-md-6">
+            <input class="form-control" type="text" name="mobile" value="{{ request.user.customer_profile.phone }}" placeholder="Mobile">
+        </div>
+        <div class="col-md-6">
+            <input class="form-control" type="text" name="email" value="{{ request.user.customer_profile.email }}" placeholder="Email">
+        </div>
+        <div class="col-md-12">
+            <button type="submit" >Update Account</button>
+        </div>
+    </div>
+</form>
+<br>
+<br>
+                                <h4>Password change</h4>
+                                <form method="post" action="{% url 'change_password' %}">
+                                    {% csrf_token %}
+                                    <label for="current_password">Current Password:</label><br>
+                                    <input type="password" id="current_password" name="current_password" required><br>
+                                    <label for="new_password">New Password:</label><br>
+                                    <input type="password" id="new_password" name="new_password" required><br>
+                                    <label for="confirm_password">Confirm Password:</label><br>
+                                    <input type="password" id="confirm_password" name="confirm_password" required><br></br>
+                                    <div class="col-md-12">
+                                        <button type="submit">Change Password</button>
+                                    </div>
+                                </form>
+                                {% if messages %}
+                                    <ul>
+                                        {% for message in messages %}
+                                            <li>{{ message }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- My Account End -->
+        
+        <!-- Footer Start -->
+        {% include "footer.html" %}
+        <!-- Footer End -->
+             
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        {% comment %} <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script> {% endcomment %}
+        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+        <script src="{% static 'lib/slick/slick.min.js' %}"></script>
+        
+        <!-- Template Javascript -->
+        <script src="{% static 'js/main.js' %}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Check if there is a hash in the URL (e.g., #address-tab)
+                var hash = window.location.hash;
+                if (hash) {
+                    // Find the corresponding tab link and show it
+                    var tabLink = document.querySelector('a[href="' + hash + '"]');
+                    if (tabLink) {
+                        var tab = new bootstrap.Tab(tabLink);
+                        tab.show();
+                    }
+                }
+                
+                // Update the URL when a tab is clicked
+                var navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        history.replaceState(null, null, link.getAttribute('href'));
+                    });
+                });
+            });
+        </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script>
+            
+            // AJAX form submission
+            document.getElementById('update-account-form').addEventListener('submit', function (e) {
+                e.preventDefault();  // Prevent the form from submitting the traditional way
+        
+                var formData = new FormData(this);  // Capture the form data
+                
+                fetch("{% url 'update_account' %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.options = {
+                            "closeButton": true,
+                            "debug": false,
+                            "newestOnTop": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",  // Position of the toast
+                            "preventDuplicates": true,
+                            "onclick": null,
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "5000",  // Duration the toast is visible
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        };
+                        toastr.success(data.message);  // Display success message with Toastr
+                    } else {
+                        toastr.error(data.message);  // Display error message with Toastr
+                    }
+                })
+                .catch(error => {
+                    toastr.error('An error occurred while updating your account.');  // Handle unexpected errors
+                });
+            });
+        </script>
+    </body>
+</html>

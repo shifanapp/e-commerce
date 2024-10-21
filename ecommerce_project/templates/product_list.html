@@ -1,0 +1,123 @@
+{% load chunks_filters %}
+
+{% for product_chunks in products|chunk:1 %}
+<div class="col-lg-4 col-md-6 col-sm-6">
+    {% for product in product_chunks %}
+    <div class="product__item">
+        <div class="product__item__pic set-bg">
+            <a href="{% url 'product_detail' product.id %}"><img src="{{ product.image_url.url }}"></a>
+            <ul class="product__hover">
+                <li><a href="{{ product.image_url.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                <li><a href="#" class="add-to-wishlist" data-product-id="{{ product.id }}"><span class="icon_heart_alt"></span></a></li>
+                <li><a href="" class="add-to-cart" data-product-id="{{ product.id }}"><span class="icon_bag_alt"></span></a></li>
+            </ul>
+        </div>
+        <div class="product__item__text">
+            <h6><a href="#">{{ product.name }}</a></h6>
+            <div class="rating">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            </div>
+            <div class="product__price">{{ product.price }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+<script>
+    $(document).ready(function() {
+        alert("hhh")
+        $('.add-to-cart').on('click', function(e) {
+            e.preventDefault();
+            var productId = $(this).data('product-id');
+            var quantity = $(this).closest('.product-item').find('.quantity').val() || 1;
+
+            $.ajax({
+                url: "{% url 'add_to_cart' %}",
+                type: "POST",
+                data: {
+                    'product_id': productId,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.cart_count !== undefined) {
+                        $('#cart-count').text(response.cart_count);
+                    }
+                    toastr.success(response.message);
+                },
+                error: function(response) {
+                    toastr.error("An error occurred. Please try again.");
+                }
+            });
+        });
+
+        $('.add-to-wishlist').on('click', function(e) {
+            e.preventDefault();
+            var productId = $(this).data('product-id');
+
+            $.ajax({
+                url: "{% url 'add_to_wishlist' %}",
+                type: "POST",
+                data: {
+                    'product_id': productId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.wishlist_count !== undefined) {
+                        $('#wishlist-count').text(response.wishlist_count);
+                    }
+                    toastr.success(response.message);
+                },
+                error: function(response) {
+                    if (response.status === 403) {
+                        toastr.error("You need to log in to perform this action.");
+                    } else if (response.status === 400) {
+                        toastr.error(response.responseJSON.message);
+                    } else {
+                        toastr.error("An error occurred. Please try again.");
+                    }
+                }
+            });
+        });
+
+        $('#filter-form').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+
+            $.ajax({
+                alert("hu"),
+                url: "{% url 'list_product' %}",
+                type: "GET",
+                data: formData,
+                success: function(response) {
+                    $('#product-list').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        $('.categories__accordion .card-heading a').on('click', function(e) {
+            e.preventDefault();
+            var category = $(this).data('category');
+            var formData = $('#filter-form').serialize() + '&category=' + category;
+
+            $.ajax({
+                url: "/category/" + category + "/",
+                type: "GET",
+                data: formData,
+                success: function(response) {
+                    $('#product-list').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>

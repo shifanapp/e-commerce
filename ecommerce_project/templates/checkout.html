@@ -1,0 +1,419 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <!-- Address CSS -->
+    <link rel="stylesheet" href="{% static 'css/style4.css' %}" type="text/css">
+    <link href="{% static 'css/style5.css' %}" rel="stylesheet">
+    <script>
+        // Toggle form visibility for adding a new address
+        function toggleAddAddressForm() {
+            document.getElementById('address-form').style.display = 'block';
+            document.getElementById('action').value = 'add'; // Set form action to 'add'
+            clearFormFields(); // Clear form fields for adding a new address
+        }
+        function clearFormFields() {
+            document.getElementById('address_id').value = '';
+            document.getElementById('line1').value = '';
+            document.getElementById('line2').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('country').value = '';
+            document.getElementById('zip_code').value = '';
+            document.getElementById('phone_number').value = '';
+            document.getElementById('is_default').checked = false;
+        }
+        // Prevent default form submission and handle it through JS
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+            const formData = $('#address-form').serialize();
+        
+            $.ajax({
+                url: '{% url "manage_addresses" %}', // Django URL for managing addresses
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": true,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",  // Position of the toast
+                        "preventDuplicates": true,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",  // Duration the toast is visible
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                    };
+                    toastr.success(response.message); // Show success message using toastr
+                    
+                    if (response.address) {
+                        // Add the new address to the address list in the DOM
+                        updateAddressInDOM(response.address);
+                    }
+                    
+                    // Clear the form fields after submission
+                    clearFormFields();
+        
+                    // Hide the form modal or the form itself
+                    document.getElementById('address-form').style.display = 'none';
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText); // Log any errors for debugging
+                    toastr.error("An error occurred while adding the address.");
+                }
+            });
+        }
+        
+        
+        function updateAddressInDOM(address) {
+            const addressHTML = `
+                <div id="address-${address.id}">
+                    <p>${address.line1}, ${address.city}, ${address.state}, ${address.country} - ${address.zip_code}<br>
+                        Phone: ${address.phone_number}<br>
+                        Default: ${address.is_default ? 'Yes' : 'No'}
+                    </p>
+                    <hr>
+                </div>`;
+        
+            let existingElement = document.getElementById('address-' + address.id);
+            if (existingElement) {
+                existingElement.outerHTML = addressHTML;
+            } else {
+                // Append new address and remove the "No addresses available" message if present
+                $('.address-list').append(addressHTML);
+                $('.no-address-message').remove(); // Remove no-address message if any
+            }
+        }
+        
+    </script>
+    <style>
+        /* General styles for the address list container */
+    .address-list {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    
+    /* Styles for individual address entries */
+    .address-list p {
+        font-size: 16px;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        line-height: 1.5;
+    }
+    
+    /* Buttons for editing and deleting addresses */
+    .address-list button {
+        background-color: #007BFF;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    
+    .address-list button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Separator line between addresses */
+    .address-list hr {
+        border: 0;
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
+    
+    /* Style for the 'Add Address' button */
+    button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    button:hover {
+        background-color: #218838;
+    }
+    
+    /* Styles for the Add/Edit Address form */
+    #address-form {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    
+    #address-form label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    #address-form input[type="text"],
+    #address-form input[type="checkbox"] {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    
+    /* Checkbox and its label alignment */
+    #address-form input[type="checkbox"] {
+        width: auto;
+        margin-right: 5px;
+    }
+    
+    #address-form button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    #address-form button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Style to hide the form initially */
+    #address-form {
+        display: none;
+    }
+    </style>
+</head>
+<body>
+    <!-- Checkout Start -->
+    <div class="checkout">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="checkout-inner">
+                        <div class="billing-address">
+                            <h2>Billing Address</h2>
+                            {% comment %} <form id="checkout-form" method="POST">
+                                {% csrf_token %} {% endcomment %}
+<div class="address-list">
+    {% if addresses %}
+        {% for address in addresses %}
+        <div id="address-{{ address.id }}">
+            <input type="radio" id="address_{{ address.id }}" name="address_id" value="{{ address.id }}" {% if address.is_default %}checked{% endif %}>
+            <label for="address_{{ address.id }}">
+                <p>{{ address.line1 }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.zip_code }}<br>
+                    Phone: {{ address.phone_number }}<br>
+                    Default: {{ address.is_default }}</p>
+            </label>
+            <hr>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-address-message">No addresses available. Please add one!</p>
+    {% endif %}
+</div>
+
+                        </div>
+ <!-- Button to toggle Add Address Form -->
+                                <button onclick="toggleAddAddressForm()">Add Address</button>
+                            
+                                <!-- Add/Edit Address Form (Initially Hidden) -->
+                                <form id="address-form" method="post" action={% url "manage_addresses" %} onsubmit="submitForm(event)" style="display:none;">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="action" name="action" value="add">
+                                    <input type="hidden" id="address_id" name="address_id">
+                                    <label for="line1">Line 1:</label>
+                                    <input type="text" id="line1" name="line1" required><br>
+                                    <label for="line2">Line 2:</label>
+                                    <input type="text" id="line2" name="line2"><br>
+                                    <label for="city">City:</label>
+                                    <input type="text" id="city" name="city" required><br>
+                                    <label for="state">State:</label>
+                                    <input type="text" id="state" name="state" required><br>
+                                    <label for="country">Country:</label>
+                                    <input type="text" id="country" name="country" required><br>
+                                    <label for="zip_code">Zip Code:</label>
+                                    <input type="text" id="zip_code" name="zip_code" required><br>
+                                    <label for="phone_number">Phone Number:</label>
+                                    <input type="text" id="phone_number" name="phone_number" required><br>
+                                    <label for="is_default">Default:</label>
+                                    <input type="checkbox" id="is_default" name="is_default"><br>
+                                    <button type="submit">Submit</button>
+                                </form>
+                            </div>
+                            
+
+
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <form method="post" id="myform" >
+                        {% csrf_token %}
+                        {% comment %} <input type="hidden" id="address_id" name="address_id" value={{address.id}}> {% endcomment %}
+
+                        <input type="hidden" name="total" value="{{ total }}">
+                        <input type="hidden" name="subtotal" value="{{ subtotal }}">
+                        <input type="hidden" name="status" value="{{ status }}">
+                    </form>
+                        <div class="checkout-inner">
+                           print({{address_id}})
+                            <div class="checkout-summary">
+                                <h1>Cart Total</h1>
+                                <div class="sub-total">Sub Total</div>
+                                    {% if  total  %}
+                                    <span>{{ total }}</span>
+                                    {% else %}
+                                    {% for order_item in order_items %}
+                                    {{ order_item.product.price }}
+                                    {% endfor %}
+                                    {% endif %}
+                                    
+                                {% comment %} <p class="ship-cost">Shipping Cost<span>40.00</span></p> {% endcomment %}
+                                <h2>Grand Total {% if  total  %}
+                                    <span>{{ total }}</span>
+                                    {% else %}
+                                    {% for order_item in order_items %}
+                                    <span>{{ order_item.product.price }}</span>
+                                    {% endfor %}
+                                    {% endif %}</h2>
+                            </div>
+                            <div class="checkout-payment">
+                                <div class="order-info-content">
+                                    <h2>Bag Summary</h2>
+                                    <div class="line"></div>
+                                    {% for order_item in order_items %}
+                                    <table class="order-table">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <img src="{{ order_item.product.image_url.url }}"  width="90" height="90">
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        Product Name: {{ order_item.product.name }}<br>
+                                                        Quantity: {{ order_item.quantity }}<br>
+                                                        Price: {{ order_item.product.price }}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    {% endfor %}
+                                </div>
+                                <div class="checkout-btn">
+                                    <button  id="place-order">Place Order</button>
+                                </div>
+                            {% comment %} </form> {% endcomment %}
+                            </div>
+                        </div>
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+    <!-- Footer Start -->
+    {% include "footer.html" %}
+    <!-- Footer End -->
+    
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+    <!-- JavaScript Libraries -->   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/slick/slick.min.js' %}"></script>
+    
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+<!--Razorpay payment-->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script type="text/javascript">
+        document.getElementById('place-order').onclick = function() {
+            // Get selected address
+    var selectedAddress = document.querySelector('input[name="address_id"]:checked');
+    
+    if (!selectedAddress) {
+        alert('Please select an address before proceeding.');
+        return;
+    }
+    var addressId = selectedAddress.value;
+            var options = {
+                "key": "{{ razorpay_key }}",  // Razorpay API Key
+                "amount": "{{ razorpay_amount }}",  // Amount in paise
+                "currency": "{{ razorpay_currency }}",  // Currency
+                "name": "Ashion",
+                "description": "Test Transaction",
+                "order_id": "{{ razorpay_order_id }}",  // Razorpay order ID
+                "handler": function (response) {
+                    console.log('Payment response:', response);
+
+                    // Send payment details to server
+                    $.ajax({
+                        url: "{% url 'verify_payment' %}",  // Your Django view URL
+                        type: 'post',
+                        data: {
+                            "razorpay_payment_id": response.razorpay_payment_id,
+                            "razorpay_order_id": response.razorpay_order_id,
+                            "razorpay_signature": response.razorpay_signature,
+                            "address_id": addressId,  // Include the selected address ID
+
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            window.location.href = "{% url 'orders' %}";  // Redirect to orders page
+                        },
+                        error: function (error) {
+                            console.error(error);
+                        }
+                    });
+                },
+                "prefill": {
+                    "name": "{{ user.username }}",
+                    "email": "{{ user.email }}",
+                    "contact": "{{ user.profile.phone_number }}"
+                },
+            };
+        
+            var rzp = new Razorpay(options);
+            console.log('Opening Razorpay checkout...');
+            rzp.open();
+        };
+    </script>
+    
+</body>
+</html>

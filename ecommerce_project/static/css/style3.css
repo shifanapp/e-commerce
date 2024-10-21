@@ -1,0 +1,112 @@
+/* General styles for the address list container */
+.address-list {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Styles for individual address entries */
+.address-list p {
+    font-size: 16px;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    line-height: 1.5;
+}
+
+/* Buttons for editing and deleting addresses */
+.address-list button {
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.address-list button:hover {
+    background-color: #0056b3;
+}
+
+/* Separator line between addresses */
+.address-list hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 20px 0;
+}
+
+/* Style for the 'Add Address' button */
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Styles for the Add/Edit Address form */
+#address-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#address-form label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+#address-form input[type="text"],
+#address-form input[type="checkbox"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Checkbox and its label alignment */
+#address-form input[type="checkbox"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+#address-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#address-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Style to hide the form initially */
+#address-form {
+    display: none;
+}

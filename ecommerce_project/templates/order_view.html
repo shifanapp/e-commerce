@@ -1,0 +1,237 @@
+<html>
+{% load static %}
+<head>
+<link rel="stylesheet" href="{% static 'css/order_view_style.css' %}" type="text/css">
+<style>
+    .order-summary {
+        width: 80%;
+        margin: auto;
+    }
+    
+    .order-address, .order-status, .order-items {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    
+    .item {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+    }
+    
+    .item img {
+        width: 100px;
+        margin-right: 20px;
+    }
+    
+    .item-details {
+        flex-grow: 1;
+    }
+    
+    .status-track {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .invoice-box {
+        max-width: 800px;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        font-size: 16px;
+        line-height: 24px;
+    }
+    #invoice-pdf {
+        display: none;
+        border: 1px solid #eee;
+        margin-top: 20px;
+    }
+    #close-pdf-btn {
+        display: none;
+        margin-top: 10px;
+        cursor: pointer;
+        color: red;
+    }
+
+    /* order_detail.css */
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.order-details h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.delivery-address, .rewards-section, .order-items, .order-tracking, .order-feedback, .return-policy {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.order-items .order-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-items .order-item:last-child {
+    border-bottom: none;
+}
+
+.product-image img {
+    width: 100px;
+    margin-right: 20px;
+}
+
+.product-info h5 {
+    font-size: 18px;
+}
+
+.order-tracking .tracking-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.status-dot {
+    height: 15px;
+    width: 15px;
+    background-color: #28a745;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.status-dot.shipped {
+    background-color: #17a2b8;
+}
+
+.status-dot.out-for-delivery {
+    background-color: #ffc107;
+}
+
+.status-dot.delivered {
+    background-color: #28a745;
+}
+
+.return-policy p {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.return-policy a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+</style>
+</head>
+<body>
+
+{% for order in order_items %}
+<div class="order-summary">
+    <h2>Order Details</h2>
+    <div class="order-address">
+
+    <div class="col">
+        <p class="text">Order ID: <span class="font-weight-bold text-dark">{{ order.id }}</span></p>
+        <p class="text">Placed On: <span class="font-weight-bold text-dark">{{ order.ordered_date|date:"d, F Y" }}</span></p>
+    </div>
+
+    <div class="flex-col my-auto">
+        <h6 class="ml-auto mr-3">
+            <button id="view-invoice-btn" data-order-id="{{ order.id }}">View Invoice</button>
+             <!-- Close Button for PDF -->
+             <button id="close-pdf-btn">Close PDF</button>
+            <iframe id="invoice-pdf" width="100%" height="600px" src="http://127.0.0.1:8000/order/invoice/view/{{ order.id }}/"></iframe>
+            
+           
+        </h6>
+    </div>
+</div>
+    <div class="order-address">
+        <h4>Delivery Address</h4>
+        {% comment %} {% for address in addresses %} {% endcomment %}
+        <p>{{ address.line1 }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.zip_code }}<br>
+            Phone: {{ address.phone_number }}<br>
+            Default: {{ address.is_default }}</p>
+            {% comment %} {% endfor %} {% endcomment %}
+    </div>
+
+    <!-- Order Tracking Section -->
+    <div class="order-tracking">
+        <h4>Order Tracking</h4>
+        <div class="tracking-status">
+            <div class="status-line">
+                <span class="status-dot confirmed"></span>
+                <p>Order Confirmed - {{ local_time }}</p>
+            </div>
+            <div class="status-line">
+                <span class="status-dot shipped"></span>
+                <p>Shipped - {{ order.updated_at|date:"D, d M" }}</p>
+            </div>
+            <div class="status-line">
+                <span class="status-dot out-for-delivery"></span>
+                <p>Out for Delivery</p>
+            </div>
+            <div class="status-line">
+                <span class="status-dot delivered"></span>
+                <p>Delivered</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-items">
+        <h4>Order Items</h4>
+        {% comment %} {% for item in order_items %} {% endcomment %}
+            <div class="item">
+                <img src="{{ order.product.image_url.url }}" alt="{{ order.product.name }}" />
+                <div class="item-details">
+                    <h5>{{ order.product.name }}</h5>
+                    <p>Quantity: {{ order.quantity }}</p>
+                    <p>Price: ₹{{ order.product.price }}</p>
+                </div>
+            </div>
+        {% comment %} {% endfor %} {% endcomment %}
+    </div>
+</div>
+{% endfor %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Show PDF when 'View Invoice' button is clicked
+        $('#view-invoice-btn').on('click', function() {
+            var orderId = $(this).data('order-id');
+            var url = "{% url 'view_invoice_pdf' 0 %}".replace('0', orderId);
+            
+            // Show the iframe with the PDF and close button
+            $('#invoice-pdf').attr('src', url).show();
+            $('#close-pdf-btn').show();
+        });
+        
+        // Hide PDF when 'Close PDF' button is clicked
+        $('#close-pdf-btn').on('click', function() {
+            $('#invoice-pdf').hide();  // Hide iframe
+            $(this).hide();  // Hide close button
+        });
+    });
+</script>
+</body>
+</html>

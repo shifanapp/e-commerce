@@ -1,0 +1,407 @@
+{% load static %}
+{% load chunks_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block base %}
+    {% include "base.html" %}
+    {% endblock base %}
+    {% block header %}
+    {% include "header.html" %}
+    {% endblock header %}
+    <style>
+    .search-container {
+        display: flex;
+        justify-content: center; /* Horizontally centers the content */
+        align-items: center; /* Vertically centers the content */
+        height: 100%; /* Ensure the container has height */
+        {% comment %} padding: 1px 0; /* Optional: Add some padding around */ {% endcomment %}
+    }
+    
+    #search-input {
+        width: 100%;
+        max-width: 400px; /* You can adjust this width to your liking */
+        padding: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        #search-input {
+            width: 100%;
+            max-width: 100%; /* Full width on smaller screens */
+        }
+    }
+    
+</style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header Section Begin -->
+    
+    <!-- Header Section End -->
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'home' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>Shop</span>
+                        <div class="search-container">
+                        <form id="search-form" method="GET">
+                            <input type="text" id="search-input" name="q" placeholder="Search for products..." autocomplete="off">
+                        </form> 
+                    </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3">
+                    <div class="shop__sidebar">
+                        <form id="filter-form">
+                            <div class="sidebar__categories">
+                                <div class="section-title">
+                                    <h4>Categories</h4>
+                                </div>
+                                {% comment %} {% for item in category %} {% endcomment %}
+                                <div class="categories__accordion">
+                                    <div class="accordion" id="accordionExample">
+                                        {% if category == "women" %}
+                                        
+                                        <div class="card">
+                                            <div class="card-heading active">
+                                                <a data-toggle="collapse" data-target="#collapseOne">Women</a>
+                                            </div>
+                                            <div id="collapseOne" class="collapse" data-parent="#accordionExample">
+                                                <div class="card-body">
+                                                    <ul>
+                                                        {% for subcategory in subcategories %}
+                                                            {% if subcategory.category.name == "women" %}
+                                                                <li>
+                                                                    <a href="?subcategory={{ subcategory.name }}">{{ subcategory.name }}</a>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         {% elif category == "kids" %}
+                                        <div class="card">
+                                            <div class="card-heading">
+                                                <a data-toggle="collapse" data-target="#collapseThree">Kids</a>
+                                            </div>
+                                            <div id="collapseThree" class="collapse" data-parent="#accordionExample">
+                                                <div class="card-body">
+                                                    <ul>
+                                                        {% for subcategory in subcategories %}
+                                                            {% if subcategory.category.name == "kids" %}
+                                                                <li>
+                                                                    <a href="?subcategory={{ subcategory.name }}">{{ subcategory.name }}</a>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                         {% else %} 
+                                         <div class="categories__accordion">
+                                            <div class="accordion" id="accordionExample">
+                                                <div class="card">
+                                                    <div class="card-heading active">
+                                                        <a data-toggle="collapse" data-target="#collapseOne">Women</a>
+                                                    </div>
+                                                    <div id="collapseOne" class="collapse" data-parent="#accordionExample">
+                                                        <div class="card-body">
+                                                            <ul>
+                                                                {% for subcategory in subcategories %}
+                                                                    {% if subcategory.category.name == "women" %}
+                                                                        <li>
+                                                                            <a href="?subcategory={{ subcategory.name }}">{{ subcategory.name }}</a>
+                                                                        </li>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card">
+                                                    <div class="card-heading">
+                                                        <a data-toggle="collapse" data-target="#collapseThree">Kids</a>
+                                                    </div>
+                                                    <div id="collapseThree" class="collapse" data-parent="#accordionExample">
+                                                        <div class="card-body">
+                                                            <ul>
+                                                                {% for subcategory in subcategories %}
+                                                                    {% if subcategory.category.name == "kids" %}
+                                                                        <li>
+                                                                            <a href="?subcategory={{ subcategory.name }}">{{ subcategory.name }}</a>
+                                                                        </li>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% comment %} {% endfor %} {% endcomment %}
+                            </div>
+                            <div class="sidebar__filter">
+                                <div class="section-title">
+                                    <h4>Shop by price</h4>
+                                </div>
+                                <div class="filter-range-wrap">
+                                    <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                        data-min="10" data-max="1000"></div>
+                                    <div class="range-slider">
+                                        <div class="price-input">
+                                            <p>Price:</p>
+                                            <input type="text" id="minamount" name="min_price">
+                                            <input type="text" id="maxamount" name="max_price">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success btn-sm" type="submit" id="filter-btn">Filter</button>
+                            </div>
+                                                     
+                            
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-9 col-md-9">
+                    <div class="row" id="product-list">
+                         {% for product_chunks in products|chunk:1 %}
+                        <div class="col-lg-4 col-md-6 col-sm-6">
+                            {% for product in product_chunks %}
+                            <div class="product__item">
+                               <div class="product__item__pic set-bg">
+                                <a href="{% url 'product_detail' product.id%}"><img src="{{product.image_url.url}}"></a>
+                                <ul class="product__hover">
+                                    <li><a href="{{ product.image_url.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                    <li><a href="#" class="add-to-wishlist" data-product-id="{{ product.id }}"><span class="icon_heart_alt"></span></a></li>
+                                    <li><a href="#" class="add-to-cart" data-product-id="{{ product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                </ul>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6><a href="#">{{product.name}}</a></h6>
+                                    <div class="rating">
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                        <i class="fa fa-star"></i>
+                                    </div>
+                                    <div class="product__price">{{product.price}}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    <div class="col-lg-12 text-center">
+                        <div class="pagination__option">
+                            {% if products.has_previous %}
+                                <a href="?page={{products.previous_page_number}}"><span>previous</span></a>
+                            {% endif %}
+                            {% for i in products.paginator.page_range %}
+                                <a href="?page={{i}}"><span>{{i}}</span></a>
+                            {% endfor %}
+                            {% if products.has_next %}
+                                <a href="?page={{products.next_page_number}}"><span>next</span></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Section End -->
+
+    <!-- Footer Section Begin -->
+    {% block footer %}
+    {% include "footer.html" %}
+    {% endblock footer %}
+    <!-- Footer Section End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+    <!-- Js Plugins -->
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/mixitup.min.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+       // $(document).ready(function() {
+            $('.add-to-cart').on('click', function(e) {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",  // Position of the toast
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",  // Duration the toast is visible
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var quantity = $(this).closest('.product-item').find('.quantity').val() || 1;
+        
+                console.log("Add to Cart clicked");
+                console.log("Product ID:", productId);
+                console.log("Quantity:", quantity);
+        
+                $.ajax({
+                    url: "{% url 'add_to_cart' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'quantity': quantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        console.log("Cart count from response:", response.cart_count);  // To check the count from the server
+                        $('#cart-count').text(response.cart_count);
+                        if (response.cart_count > 0) {
+                            $('#cart-count').show();
+                        } else {
+                            $('#cart-count').hide();
+                        }
+                        toastr.success(response.message);
+                    },
+                    
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        
+            $('.add-to-wishlist').on('click', function(e) {
+                toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",  // Position of the toast
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",  // Duration the toast is visible
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+        
+                console.log("Add to Wishlist clicked");
+                console.log("Product ID:", productId);
+        
+                $.ajax({
+                    url: "{% url 'add_to_wishlist' %}",
+                    type: "POST",
+                    data: {
+                        'product_id': productId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        $('#wishlist-count').text(response.wishlist_count);
+                        if (response.wishlist_count > 0) {
+                            $('#wishlist-count').show();
+                        } else {
+                            $('#wishlist-count').hide();
+                        }
+                        toastr.success(response.message);
+                    },
+                    error: function(response) {
+                        if (response.status === 403) {
+                            toastr.error("You need to log in to perform this action.");
+                        } else if (response.status === 400) {
+                            toastr.error(response.responseJSON.message);
+                        } else {
+                            toastr.error("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            });
+        //});
+        $(document).ready(function() {
+            // Trigger AJAX search on keyup event
+            $("#search-input").on("keyup", function(e) {
+                e.preventDefault();  // Prevent the form from submitting
+                
+                let searchTerm = $(this).val();  // Get the value entered in the search input
+        
+                if (searchTerm.length > 0) {
+                    // Make AJAX call only if the input is not empty
+                    $.ajax({
+                        url: "{% url 'list_product' %}",  // Use the correct URL for the search
+                        data: {
+                            'q': searchTerm  // Send the search term as 'q' parameter
+                        },
+                        success: function(data) {
+                            // On success, replace the product list with the new search results
+                            $('#product-list').html($(data).find('#product-list').html());
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('An error occurred:', error);
+                        }
+                    });
+                } 
+            });
+        });
+        
+    </script>
+</body>
+</html>

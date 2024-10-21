@@ -1,0 +1,447 @@
+{% load static %}
+<html lang="en">
+    {% block base %}
+    {% include "base.html" %}
+    {% endblock base %}
+    {% include "header.html" %}
+<head>
+    <style>
+        /* General styling for the cart quantity input */
+.cart__quantity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+}
+
+.cart-item button {
+    width: 30px;
+    height: 30px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    font-size: 18px;
+    cursor: pointer;
+    color: #333;
+}
+
+.cart-item button:hover {
+    background-color: #ddd;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    margin: 0 5px;
+    height: 30px;
+}
+
+.quantity-decrease {
+    border-right: none;
+}
+
+.quantity-increase {
+    border-left: none;
+}
+
+/* To align the total price */
+#total-price {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+    padding-left: 10px;
+}
+
+    </style>
+    
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+        <!-- Header Section Begin -->
+        
+        <!-- Header Section End -->
+    <!-- Shop Cart Section Begin -->
+    <section class="shop-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shop__cart__table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <div id="message-container" style="display: none;" class="alert"></div>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr class="cart-item-delete" data-cart-item-id="{{ item.id }}">
+                                    <td class="cart__product__item">
+                                        <img src="{{item.product.image_url.url}}" alt=""width="90" height="90">
+                                        <div class="cart__product__item__title">
+                                            <h6>{{item.product.name}}</h6>
+                                            <div class="rating">
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                            <button class="btn btn-danger delete-item" data-cart-item-id="{{ item.id }}">Remove</button>
+                                    </td>
+                                    <td class="cart__price">{{item.product.price}}</td>
+                                    <td class="cart__quantity">
+                                        <form id="cart-form" method="post" action="">
+                                            <div class="cart-item" data-product-id="{{ item.product.id }}">
+                                                <button type="button" class="quantity-decrease">-</button>
+                                                <input type="text" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
+                                                <button type="button" class="quantity-increase">+</button>
+                                            </div>
+                                            <td>
+                                                <span id="total-price">{{ item.get_total_price }}</span>
+                                            </td>
+                                        </form>
+                                    </td>
+                                    
+                                        
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="cart__btn">
+                        <a href=" {% url "list_product" %}">Continue Shopping</a>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="discount__content">
+                        <h6>Discount codes</h6>
+                        <form id="applyCouponForm" method="post">
+                            {% csrf_token %}
+                            <input type="text" id="coupon_code" name="coupon_code" placeholder="Enter coupon code">
+                            <button type="submit" id="applyCouponBtn" class="site-btn">Apply</button>
+                        </form>
+                        <button id="remove-coupon" class="btn btn-danger" style="display: none;">Remove Coupon</button>
+                        <div id="couponMessage"></div>
+                    </div>
+                </div>
+                <div class="col-lg-4 offset-lg-2">
+                    <div class="cart__total__procced">
+                        <h6>Cart total</h6>
+                        <ul>
+                            <li id="total">Total: <span>{{subtotal}}</span></li>
+                            <li id="cartTotal">Subtotal: <span id="cartTotalAmount">{{ total }}</span></li>
+                            <li id="discountAmount">Discount: <span id="discountAmountValue"></span></li>
+                        </ul>
+                        <form method="post" action="{% url 'checkout' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="total" value="{{total}}">
+                            <input type="hidden" name="subtotal" value="{{ subtotal }}">
+                            
+                            <button type="submit" class="primary-btn">Proceed to checkout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Cart Section End -->
+
+    <!-- Footer Section Begin -->
+    {% include "footer.html" %}
+    <!-- Footer Section End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+   <!-- Js Plugins -->
+<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/mixitup.min.js' %}"></script>
+<script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+<script src="{% static 'js/jquery.slicknav.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<!--coupon code starts here -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const applyCouponForm = document.getElementById('applyCouponForm');
+        const couponMessage = document.getElementById('couponMessage');
+        const cartTotalElement = document.getElementById('cartTotalAmount');
+        const discountAmountElement = document.getElementById('discountAmountValue');
+        const removeCouponButton = document.getElementById('remove-coupon');
+        const couponCodeInput = document.getElementById('coupon_code');
+        const applyCouponBtn = document.getElementById('applyCouponBtn');
+    
+        applyCouponForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(applyCouponForm);
+    
+            fetch("{% url 'apply_coupon' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                couponMessage.textContent = data.message;
+                if (data.success) {
+                    cartTotalElement.textContent = data.cart_total;
+                    discountAmountElement.textContent = data.discount_amount;
+    
+                    // Hide apply button and show remove button with coupon name
+                    applyCouponBtn.style.display = 'none';
+                    removeCouponButton.style.display = 'inline-block';
+                    removeCouponButton.textContent = `Remove Coupon (${couponCodeInput.value})`;
+    
+                    // Clear the coupon input field
+                    couponCodeInput.value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    
+        removeCouponButton.addEventListener('click', function() {
+            fetch("{% url 'remove_coupon' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                couponMessage.textContent = data.message;
+                if (data.success) {
+                    cartTotalElement.textContent = data.cart_total;
+                    discountAmountElement.textContent = '0';
+    
+                    // Show apply button again and hide remove button
+                    applyCouponBtn.style.display = 'inline-block';
+                    removeCouponButton.style.display = 'none';
+                    removeCouponButton.textContent = 'Remove Coupon';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+<!--coupon code ends here -->
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!--quantity updated from cart code starts here-->
+<script type="text/javascript">
+    {% comment %} $(document).ready(function() { {% endcomment %}
+        {% comment %} total-price.show() {% endcomment %}
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",  // Position of the toast
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",  // Duration the toast is visible
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.cart-item').forEach(cartItem => {
+                const decreaseButton = cartItem.querySelector('.quantity-decrease');
+                const increaseButton = cartItem.querySelector('.quantity-increase');
+                const quantityInput = cartItem.querySelector('.quantity-input');
+                const productId = cartItem.getAttribute('data-product-id');
+        
+                const updateTotal = (quantity) => {
+                    // Fetch the updated total price using AJAX
+                    fetch('{% url "update_cart_quantity" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: new URLSearchParams({
+                            'cart_id': '{{ cart.id }}',
+                            'product_id': productId,
+                            'quantity': quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let totalPrice = parseFloat(data.item_total);
+                            if (!isNaN(totalPrice)) {
+                                document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+                                document.getElementById('total').innerText = totalPrice.toFixed(2);                            } else {
+                                console.error("Error: total_price is not a number");
+                            }
+                        } else {
+                            alert('Error: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                };
+        
+                // Handle the decrease button click event
+                decreaseButton.addEventListener('click', (e) => {
+                    e.preventDefault();  // Prevent form submission
+                    let quantity = parseInt(quantityInput.value, 10);
+                    if (quantity > 1) {
+                        quantity--;
+                        quantityInput.value = quantity;
+                        updateTotal(quantity);  // Update the cart and total price
+                    }
+                });
+        
+                // Handle the increase button click event
+                increaseButton.addEventListener('click', (e) => {
+                    e.preventDefault();  // Prevent form submission
+                    let quantity = parseInt(quantityInput.value, 10);
+                    quantity++;
+                    quantityInput.value = quantity;
+                    updateTotal(quantity);  // Update the cart and total price
+                });
+        
+                // Handle manual changes in the quantity input
+                quantityInput.addEventListener('change', (e) => {
+                    let quantity = parseInt(quantityInput.value, 10);
+                    if (isNaN(quantity) || quantity < 1) {
+                        quantity = 1;
+                        quantityInput.value = quantity;
+                    }
+                    updateTotal(quantity);  // Update the cart and total price
+                });
+            });
+        });
+        </script>
+        <!--update quantity code ends here.....-->
+        <!--delete product from cart ocde starts here.....-->
+        <script>
+            $('.delete-item').click(function(e){
+                e.preventDefault();
+            
+                let cartItemId = $(this).data('cart-item-id');  // Get the cart item ID from data attribute
+                console.log("Cart Item ID: ", cartItemId);  // Log the ID for debugging
+                
+                let csrfToken = '{{ csrf_token }}';
+            
+                if (!cartItemId) {
+                    alert('Cart item ID is missing!');
+                    return;
+                }
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-right",  // Position of the toast
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",  // Duration the toast is visible
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'remove_item_from_cart' pk=0 %}".replace('0', cartItemId),  // Replace pk dynamically
+                    data: {
+                        'csrfmiddlewaretoken': csrfToken,
+                    },
+                    success: function(response){
+                        if(response.success){
+                            $('button[data-cart-item-id="'+cartItemId+'"]').closest('.cart-item-delete').remove();
+                            toastr.success('Item successfully removed from cart!');
+                            // Update the subtotal in the frontend
+                            // Show success message
+                            updatecartCount();
+
+                            if ($('#cart-count').text() == 0) {
+                                window.location.href = "{% url 'empty_cart' %}";
+                            }
+                            // If the new subtotal is 0, set total to 0, otherwise show the calculated subtotal
+                            if (response.subtotal === 0) {
+                                $('#total').text('Total: 0');
+                            } else {
+                                $('#total').text('Total: ' + response.subtotal);
+                            }
+                            // Update the cart count in the menu.html (globally accessible)
+                            console.log('Cart Count:', response.cart_count);
+                            $('#cart-count').text(response.cart_count);
+                        } else {
+                            toastr.error('Failed to remove item: ' + response.error);
+                        }
+                    },
+                    error: function(response) {
+                        toastr.error('An error occurred while removing the item.');
+                    }
+                });
+            });
+        function updatecartCount() {
+            var currentcartCount = parseInt($('#cart-count').text());
+            if (currentcartCount > 0) {
+                $('#cart-count').text(currentcartCount - 1);
+            }
+        }
+    {% comment %} });              {% endcomment %}
+        </script>            
+</body>
+</html>
